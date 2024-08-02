@@ -2,7 +2,7 @@
   "_normalize": {
     "type" : "quantile",
     "min" : 5,
-    "max" : 95,
+    "max" : 95
   },
   "_comment": "Normalize the data for this model with min = 5% quantile, max = 95% quantile",
   "_model_location": "~/craft/meshnet/enmesh2/logs/tmp/curriculum_enmesh_30channels_50/model.last.pth",
