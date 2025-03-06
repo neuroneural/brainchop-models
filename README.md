@@ -7,6 +7,9 @@
 - model30chan18cls  
 - model30chan50cls
 
+# Others
+
+- multiaxial
 
 download example file
 ```
