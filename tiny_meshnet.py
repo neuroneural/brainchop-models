@@ -1,52 +1,9 @@
 from tinygrad import Tensor, nn
+from tinygrad.nn.state import torch_load, load_state_dict
 import json
 
-
-class MixedConv3d:
-  def __init__(self, *args, **kwargs):
-    nondilated_channels = kwargs.pop("nondilated_channels")
-    out_channels = kwargs.pop("out_channels")
-
-    self.conv2 = nn.Conv2d(
-        *args,
-        **kwargs,
-        out_channels=out_channels - nondilated_channels,
-    )
-    padding = kwargs.pop("padding")
-    dilation = kwargs.pop("dilation")
-    self.conv1 = nn.Conv2d(
-        *args,
-        **kwargs,
-        out_channels=nondilated_channels,
-        padding=1,
-        dilation=1,
-    )
-
-  def forward(self, x):
-    x1 = self.conv1(x)
-    x2 = self.conv2(x)
-    return Tensor.cat(x1, x2, dim=1)
-
-
-class FusedConv3d:
-  def __init__(self, *args, **kwargs):
-    super(FusedConv3d, self).__init__()
-
-    self.conv2 = nn.Conv2d(*args, **kwargs)
-    padding = kwargs.pop("padding")
-    dilation = kwargs.pop("dilation")
-    self.conv1 = nn.Conv2d(
-        *args,
-        **kwargs,
-        padding=1,
-        dilation=1,
-    )
-
-  def forward(self, x):
-    x1 = self.conv1(x)
-    x2 = self.conv2(x)
-    return x1 + x2
-
+KERNEL_SIZE = (3,3,3) # this is a very stupid hack
+LAST_KERNEL_SIZE = (1,1,1)
 
 def set_channel_num(config, in_channels, n_classes, channels):
   # input layer
@@ -66,6 +23,7 @@ def set_channel_num(config, in_channels, n_classes, channels):
 
 def construct_layer(dropout_p=0, bnorm=True, gelu=False, *args, **kwargs):
   layers = []
+  kwargs["kernel_size"] = KERNEL_SIZE
   layers.append(nn.Conv2d(*args, **kwargs))
   if bnorm:
       layers.append(
@@ -88,60 +46,62 @@ def construct_layer(dropout_p=0, bnorm=True, gelu=False, *args, **kwargs):
 
 class MeshNet:
   """Configurable MeshNet from https://arxiv.org/pdf/1612.00940.pdf"""
-
   def __init__(self, in_channels, n_classes, channels, config_file, fat=None):
     """Init"""
     with open(config_file, "r") as f:
-        config = set_channel_num(
-            json.load(f), in_channels, n_classes, channels
-        )
+      config = set_channel_num(
+        json.load(f), in_channels, n_classes, channels
+      )
 
     if fat is not None:
-        chn = int(channels * 1.5)
-        if fat in {"i", "io"}:
-            config["layers"][0]["out_channels"] = chn
-            config["layers"][1]["in_channels"] = chn
-        if fat == "io":
-            config["layers"][-1]["in_channels"] = chn
-            config["layers"][-2]["out_channels"] = chn
-        if fat == "b":
-            config["layers"][3]["out_channels"] = chn
-            config["layers"][4]["in_channels"] = chn
+      chn = int(channels * 1.5)
+      if fat in {"i", "io"}:
+        config["layers"][0]["out_channels"] = chn
+        config["layers"][1]["in_channels"] = chn
+      if fat == "io":
+        config["layers"][-1]["in_channels"] = chn
+        config["layers"][-2]["out_channels"] = chn
+      if fat == "b":
+        config["layers"][3]["out_channels"] = chn
+        config["layers"][4]["in_channels"] = chn
 
-    super(MeshNet, self).__init__()
-
-    self.layers = []
-    for block_kwargs in config["layers"]:
-        self.layers.append(
-            construct_layer(
-                dropout_p=config["dropout_p"],
-                bnorm=config["bnorm"],
-                gelu=config["gelu"],
-                **{**block_kwargs, "bias": False},
-            )
-        )
+    # Create a list to store layers with the name 'model' to match state dict keys
+    self.model = []
     
-    # Handle last layer specially
-    self.layers[-1] = nn.Conv2d(
-        config["layers"][-1]["in_channels"],
-        config["layers"][-1]["out_channels"],
-        config["layers"][-1]["kernel_size"],
-        padding=config["layers"][-1]["padding"],
-        stride=config["layers"][-1]["stride"],
-        dilation=config["layers"][-1]["dilation"],
+    # Populate the model with layers from config
+    for block_kwargs in config["layers"][:-1]:  # All but the last layer
+      self.model.append(
+        construct_layer(
+          dropout_p=config["dropout_p"],
+          bnorm=config["bnorm"],
+          gelu=config["gelu"],
+          **{**block_kwargs, "bias": False},
+        )
+      )
+    
+    # Handle last layer specially - add it to model list
+    last_config = config["layers"][-1]
+    self.model.append(
+      nn.Conv2d(
+        last_config["in_channels"],
+        last_config["out_channels"],
+        kernel_size=LAST_KERNEL_SIZE,
+        padding=last_config["padding"],
+        stride=last_config["stride"],
+        dilation=last_config["dilation"],
+      )
     )
     
     # Add bias to the last layer
-    self.final_bias = Tensor.zeros(config["layers"][-1]["out_channels"])
-    
-    self.model = lambda x: self._forward_impl(x)
+    self.final_bias = Tensor.zeros(last_config["out_channels"])
 
   def _forward_impl(self, x):
-    for _, layer in enumerate(self.layers[:-1]):
-      x = layer(x)
+    # Process all layers except the last one
+    for i in range(len(self.model) - 1):
+      x = self.model[i](x)
     
-    # Apply final layer without activation
-    x = self.layers[-1](x)
+    # Apply final layer
+    x = self.model[-1](x)
     
     # Add bias
     if self.final_bias is not None:
@@ -151,7 +111,7 @@ class MeshNet:
 
   def __call__(self, x):
     """Forward pass"""
-    return self.model(x)
+    return self._forward_impl(x)
 
 if __name__ == "__main__":
   in_chan = 1
@@ -164,10 +124,11 @@ if __name__ == "__main__":
     channels=channel, 
     config_file=config
   )
-  x = Tensor.randn(1,1,256,256)
+  state_dict = torch_load("mindgrab.pth")
+  #print(state_dict)
+  load_state_dict(model,state_dict,strict=True)
+  print('loaded state dict properly')
+
+  x = Tensor.randn(1,1,256,256,256)
   out = model(x)
   print(out.shape)
-  state_dict = nn.state.torch_load("mindgrab.pth")
-  print(state_dict)
-
-  
