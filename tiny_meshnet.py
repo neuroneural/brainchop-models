@@ -52,7 +52,6 @@ class MeshNet:
       config = set_channel_num(
         json.load(f), in_channels, n_classes, channels
       )
-
     if fat is not None:
       chn = int(channels * 1.5)
       if fat in {"i", "io"}:
@@ -64,7 +63,7 @@ class MeshNet:
       if fat == "b":
         config["layers"][3]["out_channels"] = chn
         config["layers"][4]["in_channels"] = chn
-
+    
     # Create a list to store layers with the name 'model' to match state dict keys
     self.model = []
     
@@ -81,6 +80,7 @@ class MeshNet:
     
     # Handle last layer specially - add it to model list
     last_config = config["layers"][-1]
+    # Use bias=True in the last layer instead of creating a separate bias tensor
     self.model.append(
       nn.Conv2d(
         last_config["in_channels"],
@@ -89,26 +89,23 @@ class MeshNet:
         padding=last_config["padding"],
         stride=last_config["stride"],
         dilation=last_config["dilation"],
+        bias=True  # Enable bias in the final convolution
       )
     )
     
-    # Add bias to the last layer
-    self.final_bias = Tensor.zeros(last_config["out_channels"])
-
+    # Don't create a separate bias parameter
+    # self.final_bias = Tensor.zeros(last_config["out_channels"])
+    
   def _forward_impl(self, x):
     # Process all layers except the last one
     for i in range(len(self.model) - 1):
       x = self.model[i](x)
     
-    # Apply final layer
+    # Apply final layer (bias is handled internally by the Conv2d layer)
     x = self.model[-1](x)
     
-    # Add bias
-    if self.final_bias is not None:
-      x = x + self.final_bias.reshape(1, -1, 1, 1, 1)
-    
     return x
-
+    
   def __call__(self, x):
     """Forward pass"""
     return self._forward_impl(x)
@@ -125,7 +122,7 @@ if __name__ == "__main__":
     config_file=config
   )
   state_dict = torch_load("mindgrab.pth")
-  #print(state_dict)
+  print(state_dict)
   load_state_dict(model,state_dict,strict=True)
   print('loaded state dict properly')
 
