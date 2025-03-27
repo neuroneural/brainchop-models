@@ -73,7 +73,10 @@
                             "name": "activation_1",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_1",
                         "inbound_nodes": [
@@ -152,7 +155,10 @@
                             "name": "activation_4",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_4",
                         "inbound_nodes": [
@@ -231,7 +237,10 @@
                             "name": "activation_7",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_7",
                         "inbound_nodes": [
@@ -310,7 +319,10 @@
                             "name": "activation_10",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_10",
                         "inbound_nodes": [
@@ -389,7 +401,10 @@
                             "name": "activation_13",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_13",
                         "inbound_nodes": [
@@ -468,7 +483,10 @@
                             "name": "activation_16",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_16",
                         "inbound_nodes": [
@@ -547,7 +565,10 @@
                             "name": "activation_19",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_19",
                         "inbound_nodes": [
@@ -626,7 +647,10 @@
                             "name": "activation_22",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_22",
                         "inbound_nodes": [
@@ -705,7 +729,10 @@
                             "name": "activation_25",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_25",
                         "inbound_nodes": [
@@ -784,7 +811,10 @@
                             "name": "activation_28",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_28",
                         "inbound_nodes": [
@@ -863,7 +893,10 @@
                             "name": "activation_31",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_31",
                         "inbound_nodes": [
@@ -942,7 +975,10 @@
                             "name": "activation_34",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_34",
                         "inbound_nodes": [
@@ -1021,7 +1057,10 @@
                             "name": "activation_37",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_37",
                         "inbound_nodes": [
@@ -1100,7 +1139,10 @@
                             "name": "activation_40",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_40",
                         "inbound_nodes": [
@@ -1179,7 +1221,10 @@
                             "name": "activation_43",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_43",
                         "inbound_nodes": [
@@ -1258,7 +1303,10 @@
                             "name": "activation_46",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_46",
                         "inbound_nodes": [
@@ -1337,7 +1385,10 @@
                             "name": "activation_49",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_49",
                         "inbound_nodes": [
@@ -1416,7 +1467,10 @@
                             "name": "activation_52",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_52",
                         "inbound_nodes": [
@@ -1495,7 +1549,10 @@
                             "name": "activation_55",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_55",
                         "inbound_nodes": [
@@ -1574,7 +1631,10 @@
                             "name": "activation_58",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_58",
                         "inbound_nodes": [
@@ -1653,7 +1713,10 @@
                             "name": "activation_61",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_61",
                         "inbound_nodes": [
@@ -1732,7 +1795,10 @@
                             "name": "activation_64",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_64",
                         "inbound_nodes": [
@@ -1811,7 +1877,10 @@
                             "name": "activation_67",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_67",
                         "inbound_nodes": [
@@ -1890,7 +1959,10 @@
                             "name": "activation_70",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_70",
                         "inbound_nodes": [
@@ -1969,7 +2041,10 @@
                             "name": "activation_73",
                             "trainable": false,
                             "dtype": "float32",
-                            "activation": "groupnorm"
+                            "activation": "groupnorm",
+                            "num_groups": 15,
+                            "epsilon": 1e-05,
+                            "num_channels": 15
                         },
                         "name": "activation_73",
                         "inbound_nodes": [
@@ -2078,12 +2153,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_1/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_1/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_3/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_4/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_4/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2100,12 +2203,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_7/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_7/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_9/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_10/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_10/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2122,12 +2253,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_13/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_13/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_15/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_16/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_16/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2144,12 +2303,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_19/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_19/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_21/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_22/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_22/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2166,12 +2353,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_25/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_25/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_27/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_28/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_28/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2188,12 +2403,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_31/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_31/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_33/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_34/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_34/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2210,12 +2453,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_37/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_37/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_39/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_40/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_40/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2232,12 +2503,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_43/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_43/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_45/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_46/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_46/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2254,12 +2553,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_49/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_49/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_51/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_52/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_52/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2276,12 +2603,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_55/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_55/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_57/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_58/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_58/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2298,12 +2653,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_61/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_61/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_63/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_64/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_64/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2320,6 +2703,20 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_67/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_67/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_69/kernel",
                     "shape": [
                         3,
@@ -2331,12 +2728,40 @@
                     "dtype": "float32"
                 },
                 {
+                    "name": "activation_70/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_70/beta",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
                     "name": "conv3d_72/kernel",
                     "shape": [
                         3,
                         3,
                         3,
                         15,
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_73/gamma",
+                    "shape": [
+                        15
+                    ],
+                    "dtype": "float32"
+                },
+                {
+                    "name": "activation_73/beta",
+                    "shape": [
                         15
                     ],
                     "dtype": "float32"
@@ -2361,5 +2786,8 @@
                 }
             ]
         }
-    ]
+    ],
+    "_normalize": {
+        "type": "minmax"
+    }
 }
