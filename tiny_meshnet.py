@@ -92,7 +92,7 @@ class MeshNet:
           dropout_p=config["dropout_p"],
           bnorm=config["bnorm"],
           gelu=config["gelu"],
-          **{**block_kwargs, "bias": False},
+          **{**block_kwargs, "bias": False}, # middle layers have no bias
         )
       )
     
@@ -128,16 +128,8 @@ def load_nifti(nifti_path):
 def save_segmentation(segmentation, affine, output_path):
     """Save the segmentation as a NIfTI file"""
     # Convert to numpy array and get class with highest probability (if multi-class)
-    seg_numpy = segmentation.numpy()
-    if seg_numpy.shape[1] > 1:  # If multi-class output
-        seg_class = np.argmax(seg_numpy, axis=1)[0].astype(np.int32)  # Take argmax along class dimension
-    else:
-        seg_class = (seg_numpy[0, 0] > 0.5).astype(np.int32)  # Binary threshold
-    
-    # Create NIfTI image
+    seg_class = segmentation.argmax(1)[0].numpy().astype(np.int32)
     seg_img = nib.Nifti1Image(seg_class, affine)
-    
-    # Save to file
     nib.save(seg_img, output_path)
     print(f"Segmentation saved to {output_path}")
 
@@ -177,13 +169,15 @@ if __name__ == "__main__":
         channels=channel, 
         config_file=config_path
     )
-    
     # Load pretrained weights
     state_dict = torch_load(model_path)
     state_dict = convert_keys(state_dict, nn.state.get_state_dict(model))
+
+    #"""
     print(nn.state.get_state_dict(model))
     pretty_print(state_dict)
     print(len(nn.state.get_state_dict(model).keys()), len(state_dict.keys()))
+    #"""
     load_state_dict(model, state_dict, strict=True)
     print(f"Loaded weights from {model_path}...")
     # Run inference
