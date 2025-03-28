@@ -5,6 +5,24 @@ import nibabel as nib
 import numpy as np
 import time
 
+
+def convert_keys(torch_state_dict, tiny_state_dict):
+    torch_keys = torch_state_dict.keys()
+    tiny_keys  = tiny_state_dict.keys()
+    new_dict   = {}
+    for (f, t) in zip(torch_keys, tiny_keys):
+        new_dict[t] = torch_state_dict[f]
+    return new_dict
+
+def pretty_print(state_dict):
+    """Prints a PyTorch model state dict in a readable format"""
+    import re
+    for key, tensor in state_dict.items():
+        shape_match = re.search(r'\((\d+(?:,\s*\d+)*)\)', str(tensor))
+        shape_str = shape_match.group(1) if shape_match else "unknown"
+        print(f"{key}: shape=({shape_str})")
+    print(f"\nTotal layers: {len(state_dict)}")
+
 def qnormalize(img, qmin=0.02, qmax=0.98):
     """Unit interval preprocessing with clipping"""
     qlow = np.quantile(img, qmin)
@@ -38,13 +56,14 @@ def construct_layer(dropout_p=0, bnorm=True, gelu=False, *args, **kwargs):
               affine=False,
           )
       )
+    
   relu = lambda x: x.relu()
   gelu = lambda x: x.gelu()
   dropout = lambda x: x.dropout(dropout_p)
   layers.append(gelu if gelu else relu)
   if dropout_p > 0:
     layers.append(dropout)
-  return lambda x: x.sequential(layers)
+  return layers
 
 class MeshNet:
   """Configurable MeshNet from https://arxiv.org/pdf/1612.00940.pdf"""
@@ -68,7 +87,7 @@ class MeshNet:
         
     self.model = []
     for block_kwargs in config["layers"][:-1]:  # All but the last layer
-      self.model.append(
+      self.model.extend(
         construct_layer(
           dropout_p=config["dropout_p"],
           bnorm=config["bnorm"],
@@ -161,8 +180,11 @@ if __name__ == "__main__":
     
     # Load pretrained weights
     state_dict = torch_load(model_path)
+    state_dict = convert_keys(state_dict, nn.state.get_state_dict(model))
+    print(nn.state.get_state_dict(model))
+    pretty_print(state_dict)
+    print(len(nn.state.get_state_dict(model).keys()), len(state_dict.keys()))
     load_state_dict(model, state_dict, strict=True)
     print(f"Loaded weights from {model_path}...")
-    
     # Run inference
     run_inference(model, nifti_path, output_path)
