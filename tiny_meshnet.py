@@ -4,20 +4,27 @@ import json
 import nibabel as nib
 import numpy as np
 import time
-import cc3d
-import os
-from glob import glob
-from pathlib import Path
-from tinygrad.helpers import tqdm
 
+# Model definitions (same as before)
 KERNEL_SIZE = (3,3,3)
 LAST_KERNEL_SIZE = (1,1,1)
 
+def normalize(img, qmin=0.02, qmax=0.98):
+    """Unit interval preprocessing with clipping"""
+    qlow = np.quantile(img, qmin)
+    qhigh = np.quantile(img, qmax)
+    img = (img - qlow) / (qhigh - qlow)
+    img = np.clip(img, 0, 1)  # Clip the values to be between 0 and 1
+    return img
+
 def set_channel_num(config, in_channels, n_classes, channels):
+  # input layer
   config["layers"][0]["in_channels"] = in_channels
   config["layers"][0]["out_channels"] = channels
+  # output layer
   config["layers"][-1]["in_channels"] = channels
   config["layers"][-1]["out_channels"] = n_classes
+  # hidden layers
   for layer in config["layers"][1:-1]:
     layer["in_channels"] = layer["out_channels"] = channels
   return config
@@ -27,13 +34,14 @@ def construct_layer(dropout_p=0, bnorm=True, gelu=False, *args, **kwargs):
   kwargs["kernel_size"] = KERNEL_SIZE
   layers.append(nn.Conv2d(*args, **kwargs))
   if bnorm:
-    layers.append(
-      nn.GroupNorm(
-        num_groups=kwargs["out_channels"],
-        num_channels=kwargs["out_channels"],
-        affine=False,
+      layers.append(
+          nn.GroupNorm(
+              num_groups=1,
+              #num_groups=kwargs["out_channels"],
+              num_channels=kwargs["out_channels"],
+              affine=False,
+          )
       )
-    )
   relu = lambda x: x.relu()
   gelu = lambda x: x.gelu()
   dropout = lambda x: x.dropout(dropout_p)
@@ -43,7 +51,9 @@ def construct_layer(dropout_p=0, bnorm=True, gelu=False, *args, **kwargs):
   return lambda x: x.sequential(layers)
 
 class MeshNet:
+  """Configurable MeshNet from https://arxiv.org/pdf/1612.00940.pdf"""
   def __init__(self, in_channels, n_classes, channels, config_file, fat=None):
+    """Init"""
     with open(config_file, "r") as f:
       config = set_channel_num(
         json.load(f), in_channels, n_classes, channels
@@ -60,9 +70,11 @@ class MeshNet:
         config["layers"][3]["out_channels"] = chn
         config["layers"][4]["in_channels"] = chn
         
+    # Create a list to store layers with the name 'model' to match state dict keys
     self.model = []
     
-    for block_kwargs in config["layers"][:-1]:
+    # Populate the model with layers from config
+    for block_kwargs in config["layers"][:-1]:  # All but the last layer
       self.model.append(
         construct_layer(
           dropout_p=config["dropout_p"],
@@ -72,6 +84,7 @@ class MeshNet:
         )
       )
     
+    # Handle last layer specially - add it to model list
     last_config = config["layers"][-1]
     self.model.append(
       nn.Conv2d(
@@ -81,153 +94,108 @@ class MeshNet:
         padding=last_config["padding"],
         stride=last_config["stride"],
         dilation=last_config["dilation"],
-        bias=True
+        bias=True # Enable bias in the conv layer
       )
     )
     
   def _forward_impl(self, x):
+    # Process all layers except the last one
     for i in range(len(self.model) - 1):
       x = self.model[i](x)
     
+    # Apply final layer
     x = self.model[-1](x)
+    
     return x
     
   def __call__(self, x):
+    """Forward pass"""
     return self._forward_impl(x)
 
 def cast_model_to_fp16(model):
-  from tinygrad.nn.state import get_state_dict
-  state_dict = get_state_dict(model)
-  for k, v in state_dict.items():
-    v.replace(v.cast(dtypes.float16).realize())
-  return model
-
-def normalize(data_array, qmin=0.02, qmax=0.98):
-  numpy_data = data_array.numpy() if hasattr(data_array, 'numpy') else data_array
-  qlow = np.quantile(numpy_data, qmin)
-  qhigh = np.quantile(numpy_data, qmax)
-  normalized = (numpy_data - qlow) / (qhigh - qlow)
-  normalized = np.clip(normalized, 0, 1)
-  
-  if hasattr(data_array, 'numpy'):
-    return Tensor(normalized, dtype=data_array.dtype)
-  return normalized
+    """Cast model parameters to fp16"""
+    from tinygrad.nn.state import get_state_dict
+    
+    # Get state dict
+    state_dict = get_state_dict(model)
+    
+    # Cast each parameter to fp16 and replace
+    for k, v in state_dict.items():
+        v.replace(v.cast(dtypes.float16).realize())
+    
+    print("Model cast to float16")
+    return model
 
 def load_nifti(nifti_path):
-  img = nib.load(nifti_path)
-  data = img.get_fdata().astype(np.float32)
-  return data, img.affine, img.header
+    """Load a NIfTI file and return its data as a numpy array"""
+    img = nib.load(nifti_path)
+    data = img.get_fdata().astype(np.int32)
+    # Store affine for later reconstruction
+    affine = img.affine
+    return data, affine
 
-def preprocess_volume(data):
-  # First normalize the numpy data
-  data = normalize(data)
-  
-  # Create tensor with shape [1, 1, 256, 256, 256]
-  # This matches the expected input format for 3D medical image processing
-  data_tensor = Tensor(data[np.newaxis, np.newaxis, :, :, :], dtype=dtypes.float32)
-  
-  # Cast to fp16 if configured
-  if USE_FP16:
-    data_tensor = data_tensor.cast(dtypes.float16)
+def save_segmentation(segmentation, affine, output_path):
+    """Save the segmentation as a NIfTI file"""
+    # Convert to numpy array and get class with highest probability (if multi-class)
+    seg_numpy = segmentation.numpy()
+    if seg_numpy.shape[1] > 1:  # If multi-class output
+        seg_class = np.argmax(seg_numpy, axis=1)[0].astype(np.int32)  # Take argmax along class dimension
+    else:
+        seg_class = (seg_numpy[0, 0] > 0.5).astype(np.int32)  # Binary threshold
     
-  return data_tensor
-
-def postprocess_segmentation(segmentation):
-  # Handle tensor with shape [1, 2, 256, 256, 256] or [2, 256, 256, 256]
-  seg_numpy = segmentation.numpy()
-  print(f"Segmentation tensor shape: {seg_numpy.shape}")
-  
-  # Check if we have shape [1, 2, 256, 256, 256] (with batch dimension)
-  if len(seg_numpy.shape) == 5:
-    seg_numpy = seg_numpy[0]  # Remove batch dimension
+    # Create NIfTI image
+    seg_img = nib.Nifti1Image(seg_class, affine)
     
-  # Now we should have shape [2, 256, 256, 256] (for binary classification)
-  if seg_numpy.shape[0] == 2:
-    # Binary classification case (background/foreground)
-    seg_class = np.argmax(seg_numpy, axis=0).astype(np.uint8)
-  else:
-    # Single channel case
-    seg_class = (seg_numpy > 0.5).astype(np.uint8)
-  
-  return seg_class
+    # Save to file
+    nib.save(seg_img, output_path)
+    print(f"Segmentation saved to {output_path}")
 
-def save_segmentation(segmentation, affine, header, output_path):
-  seg_img = nib.Nifti1Image(segmentation, affine, header)
-  nib.save(seg_img, output_path)
-
-def process_file(model, nifti_path, output_path, connectivity=26):
-  volume_data, affine, header = load_nifti(nifti_path)
-  input_tensor = preprocess_volume(volume_data)
-  
-  print(f"Input tensor shape: {input_tensor.shape}")
-  start_time = time.time()
-  output = model(input_tensor)
-  inference_time = time.time() - start_time
-  print(f"Inference completed in {inference_time:.2f} seconds")
-  print(f"Output tensor shape: {output.shape}")
-  
-  segmentation = postprocess_segmentation(output) # this should do connected components
-  save_segmentation(segmentation, affine, header, output_path)
-
-def process_directory(model, input_dir, output_dir, connectivity=26):
-  os.makedirs(output_dir, exist_ok=True)
-  
-  nifti_files = glob(os.path.join(input_dir, "*.nii.gz"))
-  if not nifti_files:
-    nifti_files = glob(os.path.join(input_dir, "*.nii"))
-  
-  print(f"Found {len(nifti_files)} files in {input_dir}")
-  
-  for image_path in tqdm(nifti_files, desc=f"Processing {Path(input_dir).name}"):
-    try:
-      image_name = os.path.basename(image_path)
-      if image_name.endswith('.nii.gz'):
-        image_name = image_name[:-7]
-      elif image_name.endswith('.nii'):
-        image_name = image_name[:-4]
-      mask_image_path = os.path.join(output_dir, f"{image_name}_mask.nii.gz")
-      
-      process_file(model, image_path, mask_image_path, connectivity)
-      
-    except Exception as e:
-      print(f"Error processing {image_path}: {str(e)}")
+def run_inference(model, nifti_path, output_path):
+    """Load NIfTI data, run inference with model, and save the result"""
+    print(f"Loading {nifti_path}...")
+    volume_data, affine = load_nifti(nifti_path)
+    
+    print(f"Volume shape: {volume_data.shape}")
+    print("Preprocessing volume...")
+    input_tensor = Tensor(normalize(volume_data), dtype=dtypes.float).rearrange("... -> 1 1 ...") 
+    print("Running inference...")
+    start_time = time.time()
+    output = model(input_tensor).realize()
+    inference_time = time.time() - start_time
+    print(f"Inference completed in {inference_time:.2f} seconds")
+    
+    print("Post-processing and saving result...")
+    save_segmentation(output, affine, output_path)
 
 if __name__ == "__main__":
-  USE_FP16 = False
-  CONNECTIVITY = 26
-  
-  nifti_path = "t1_crop.nii.gz"
-  model_path = "mindgrab.pth"
-  config_path = "mindgrabAE.json"
-  output_path = "segmentation_output.nii.gz"
-  
-  in_chan = 1
-  channel = 15
-  n_class = 2
-  
-  print("Initializing model...")
-  model = MeshNet(
-    in_channels=in_chan, 
-    n_classes=n_class,
-    channels=channel, 
-    config_file=config_path
-  )
-  
-  print(f"Loading weights from {model_path}...")
-  state_dict = torch_load(model_path)
-  load_state_dict(model, state_dict, strict=True)
-  
-  if USE_FP16:
+    # Paths
+    nifti_path = "t1_crop.nii.gz"  # Input NIfTI file
+    model_path = "mindgrab.pth"    # Pretrained model
+    config_path = "mindgrab.json"  # Model config
+    output_path = "segmentation_output.nii.gz"  # Output segmentation
+    
+    # Model parameters
+    in_chan = 1  # T1 MRI input has 1 channel
+    channel = 15  # Number of features in hidden layers
+    n_class = 2   # Binary segmentation (background/foreground)
+    
+    # Initialize model
+    print("Initializing model...")
+    model = MeshNet(
+        in_channels=in_chan, 
+        n_classes=n_class,
+        channels=channel, 
+        config_file=config_path
+    )
+    
+    # Load pretrained weights
+    print(f"Loading weights from {model_path}...")
+    state_dict = torch_load(model_path)
+    load_state_dict(model, state_dict, strict=True)
+    print("Model loaded successfully")
+    
+    # Cast model parameters to fp16
     model = cast_model_to_fp16(model)
-  
-  process_file(model, nifti_path, output_path, CONNECTIVITY)
-  
-  # Base directory processing code (commented)
-  # base_input_dir = "input/data"
-  # base_output_dir = "output/results"
-  # modalities = ['t1', 't2', 'flair']
-  # for modality in modalities:
-  #   input_dir = os.path.join(base_input_dir, modality, "images")
-  #   output_dir = os.path.join(base_output_dir, modality)
-  #   print(f"\nProcessing {modality} modality...")
-  #   process_directory(model, input_dir, output_dir, CONNECTIVITY)
+    
+    # Run inference
+    run_inference(model, nifti_path, output_path)
