@@ -50,8 +50,8 @@ def construct_layer(dropout_p=0, bnorm=True, gelu=False, *args, **kwargs):
   if bnorm:
       layers.append(
           nn.GroupNorm(
-              num_groups=1,
-              #num_groups=kwargs["out_channels"],
+              #num_groups=1,
+              num_groups=kwargs["out_channels"],
               num_channels=kwargs["out_channels"],
               affine=False,
           )
@@ -106,7 +106,7 @@ class MeshNet:
         padding=last_config["padding"],
         stride=last_config["stride"],
         dilation=last_config["dilation"],
-        bias=True # Enable bias in the conv layer
+        bias=False # Enable bias in the conv layer
       )
     )
     
@@ -173,11 +173,12 @@ if __name__ == "__main__":
     state_dict = torch_load(model_path)
     state_dict = convert_keys(state_dict, nn.state.get_state_dict(model))
 
-    #"""
+    """
     print(nn.state.get_state_dict(model))
     pretty_print(state_dict)
     print(len(nn.state.get_state_dict(model).keys()), len(state_dict.keys()))
-    #"""
+    """
+
     load_state_dict(model, state_dict, strict=True)
     print(f"Loaded weights from {model_path}...")
     # Run inference
