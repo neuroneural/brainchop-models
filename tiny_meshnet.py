@@ -50,7 +50,6 @@ def construct_layer(dropout_p=0, bnorm=True, gelu=False, *args, **kwargs):
   if bnorm:
       layers.append(
           nn.GroupNorm(
-              #num_groups=1,
               num_groups=kwargs["out_channels"],
               num_channels=kwargs["out_channels"],
               affine=False,
@@ -150,36 +149,29 @@ def run_inference(model, nifti_path, output_path):
     print("Post-processing and saving result...")
     save_segmentation(output, affine, output_path)
 
+
+def load_meshnet(model_fn:str, config_fn:str, 
+                 in_channels:int = 1, channels:int = 1, out_channels:int = 1):
+    # Interpret channel info from config
+    model = MeshNet(
+        in_channels=in_channels, 
+        n_classes=out_channels,
+        channels=channels, 
+        config_file=config_fn
+    )
+    state_dict = torch_load(model_fn)
+    state_dict = convert_keys(state_dict, nn.state.get_state_dict(model))
+    load_state_dict(model, state_dict, strict=True)
+    return model
+    
+
+
 if __name__ == "__main__":
     # Paths
     nifti_path = "t1_crop.nii.gz"  # Input NIfTI file
     model_path = "mindgrab.pth"    # Pretrained model
     config_path = "mindgrab.json"  # Model config
     output_path = "segmentation_output.nii.gz"  # Output segmentation
-    
-    # Model parameters
-    in_chan = 1  # T1 MRI input has 1 channel
-    channel = 15  # Number of features in hidden layers
-    n_class = 2   # Binary segmentation (background/foreground)
-    
-    # Initialize model
-    model = MeshNet(
-        in_channels=in_chan, 
-        n_classes=n_class,
-        channels=channel, 
-        config_file=config_path
-    )
-    # Load pretrained weights
-    state_dict = torch_load(model_path)
-    state_dict = convert_keys(state_dict, nn.state.get_state_dict(model))
-
-    """
-    print(nn.state.get_state_dict(model))
-    pretty_print(state_dict)
-    print(len(nn.state.get_state_dict(model).keys()), len(state_dict.keys()))
-    """
-
-    load_state_dict(model, state_dict, strict=True)
-    print(f"Loaded weights from {model_path}...")
-    # Run inference
+    model = load_meshnet(model_path,config_path,
+                         1, 15, 2)
     run_inference(model, nifti_path, output_path)
