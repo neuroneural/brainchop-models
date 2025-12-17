@@ -1,6 +1,7 @@
 {
   "header": "Subcortical-mini segmentation model - 21 channels, 18 output classes",
   "bnorm": false,
+  "elu": true,
   "dropout_p": 0,
   "bias": true,
   "layers": [

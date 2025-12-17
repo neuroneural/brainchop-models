@@ -1,6 +1,7 @@
 {
   "header": "Cortical parcellation model (aparc50) - 30 channels, 50 output classes",
   "bnorm": false,
+  "elu": true,
   "dropout_p": 0,
   "bias": true,
   "layers": [
