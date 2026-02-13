@@ -1,0 +1,22 @@
+{
+  "name": "Subcortical Segmentation (Mini)",
+  "description": "Subcortical segmentation model with 21 channels and 18 output classes",
+  "type": "parcellation",
+  "outputClasses": 18,
+  "expectedInputShape": [1, 256, 256, 256],
+  "inference": {
+    "enableSeqConv": true,
+    "cropPadding": 0,
+    "autoThreshold": 0,
+    "enableQuantileNorm": true,
+    "enableTranspose": true
+  },
+  "performance": {
+    "estimatedTimeSeconds": 10,
+    "memoryRequirementMB": 1200
+  },
+  "files": {
+    "labels": "colormap.json",
+    "preview": "preview.png"
+  }
+}

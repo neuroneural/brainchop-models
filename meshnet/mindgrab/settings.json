@@ -1,0 +1,22 @@
+{
+  "name": "MindGrab Brain Extraction",
+  "description": "Brain extraction using MindGrab architecture with 5 decoders and progressive dilation (16->8->4->2->1)",
+  "type": "brain-extraction",
+  "outputClasses": 2,
+  "expectedInputShape": [1, 256, 256, 256],
+  "inference": {
+    "enableSeqConv": false,
+    "cropPadding": 18,
+    "autoThreshold": 0.02,
+    "enableQuantileNorm": false,
+    "enableTranspose": true
+  },
+  "performance": {
+    "estimatedTimeSeconds": 3,
+    "memoryRequirementMB": 400
+  },
+  "files": {
+    "labels": "colormap.json",
+    "preview": "preview.png"
+  }
+}
