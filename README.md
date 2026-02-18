@@ -29,6 +29,7 @@ meshnet/<model>/
   model.json       # Architecture definition
   model.pth        # PyTorch weights
   model.bin        # Raw float32 weights (converted from .pth)
+  model.bcmodel    # Universal single-file format (architecture + weights + config)
   settings.json    # Inference configuration (self-describing)
   colormap.json    # Label names and colors
   preview.png      # Segmentation preview image
@@ -62,6 +63,52 @@ Each model includes a `settings.json` following the [ModelSettings schema](https
   }
 }
 ```
+
+## Universal Model Format (.bcmodel)
+
+The `.bcmodel` format stores architecture, weights, inference config, and labels in a single file — readable by tinygrad, TensorFlow.js, and WebGPU. See [BCMODEL_SPEC.md](BCMODEL_SPEC.md) for the full specification.
+
+### Converting to .bcmodel
+
+```bash
+# Convert a single model
+python convert_to_bcmodel.py meshnet/model5_gw_ae
+
+# Convert all meshnet models
+python convert_to_bcmodel.py --all
+
+# Force reconvert (overwrite existing)
+python convert_to_bcmodel.py --all --force
+```
+
+### Loading .bcmodel (Python)
+
+```python
+from load_bcmodel import load_bcmodel, execute_graph_tinygrad
+
+header, tensors = load_bcmodel("meshnet/model5_gw_ae/model.bcmodel")
+print(header["metadata"]["name"])  # "Tissue Segmentation (Light)"
+
+# Run inference
+output = execute_graph_tinygrad(header, tensors, input_tensor)
+```
+
+### Loading .bcmodel (JavaScript)
+
+```javascript
+const { loadBcmodel, getModelInfo } = require('./load_bcmodel');
+
+const model = await loadBcmodel('meshnet/model5_gw_ae/model.bcmodel');
+console.log(getModelInfo(model.header));
+```
+
+### Validating .bcmodel files
+
+```bash
+python test_bcmodel.py
+```
+
+Requires: `pip install numpy torch`
 
 ## Converting .pth to .bin
 
