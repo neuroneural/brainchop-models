@@ -1,0 +1,16 @@
+{
+  "name": "bcmodel-ts",
+  "version": "0.1.0",
+  "description": "TypeScript wrapper for bcmodel WASM with full type definitions",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.18"
+  }
+}

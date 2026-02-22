@@ -1,5 +1,5 @@
 /**
- * Load a .bcmodel file in Node.js using the WASM bindings.
+ * Load a .bcmodel file in Node.js using the TypeScript wrapper.
  *
  * Prerequisites:
  *   cd bcmodel-rs/bcmodel-wasm
@@ -9,13 +9,13 @@
  *   npx tsx load_model.ts ../../meshnet/model5_gw_ae/model.bcmodel
  */
 import { readFileSync } from "fs";
-import { initSync, WasmBcmodel } from "../bcmodel-wasm/pkg/bcmodel_wasm.js";
+import { initBcmodelSync, loadFromBuffer, computeTensorStats } from "../bcmodel-ts/src/index.js";
 
 // --- Initialize WASM ---
 const wasmBytes = readFileSync(
   new URL("../bcmodel-wasm/pkg/bcmodel_wasm_bg.wasm", import.meta.url)
 );
-initSync({ module: wasmBytes });
+initBcmodelSync(wasmBytes);
 
 // --- Parse CLI args ---
 const modelPath = process.argv[2];
@@ -26,7 +26,7 @@ if (!modelPath) {
 
 // --- Load model ---
 const data = new Uint8Array(readFileSync(modelPath));
-const model = new WasmBcmodel(data);
+const model = loadFromBuffer(data);
 
 // --- Model info ---
 console.log(`Name:         ${model.name}`);
@@ -40,12 +40,7 @@ console.log();
 
 // --- Architecture graph ---
 console.log("Architecture:");
-const graph = model.graph as unknown as Array<{
-  id: string;
-  op: string;
-  inputs: string[];
-}>;
-for (const node of graph) {
+for (const node of model.graph) {
   const inputs =
     node.inputs.length > 0
       ? ` <- ${node.inputs.join(", ")}`
@@ -58,27 +53,18 @@ console.log();
 console.log("Tensors:");
 for (const name of model.tensorNames()) {
   const shape = model.tensorShape(name);
-  const tensor = model.tensorData(name);
-  if (tensor && shape) {
-    let min = Infinity;
-    let max = -Infinity;
-    for (let i = 0; i < tensor.length; i++) {
-      if (tensor[i] < min) min = tensor[i];
-      if (tensor[i] > max) max = tensor[i];
-    }
+  const data = model.tensorData(name);
+  if (data && shape) {
+    const stats = computeTensorStats(name, data, shape);
     console.log(
-      `  ${name.padEnd(30)} shape=[${shape}]  min=${min.toFixed(4)}  max=${max.toFixed(4)}`
+      `  ${name.padEnd(30)} shape=[${shape}]  min=${stats.min.toFixed(4)}  max=${stats.max.toFixed(4)}`
     );
   }
 }
 console.log();
 
 // --- Labels ---
-const labels = model.labels as unknown as Array<{
-  index: number;
-  name: string;
-  color: number[];
-}>;
+const labels = model.labels;
 if (labels && labels.length > 0) {
   console.log("Labels:");
   for (const label of labels) {
@@ -91,7 +77,7 @@ if (labels && labels.length > 0) {
 }
 
 // --- Inference config ---
-const config = model.inferenceConfig as unknown as Record<string, unknown>;
+const config = model.inferenceConfig;
 if (config) {
   console.log("Inference config:");
   for (const [key, value] of Object.entries(config)) {
