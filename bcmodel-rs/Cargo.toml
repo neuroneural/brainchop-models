@@ -1,0 +1,3 @@
+[workspace]
+members = ["bcmodel-core", "bcmodel-wasm", "bcmodel-py"]
+resolver = "2"

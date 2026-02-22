@@ -1,0 +1,17 @@
+[package]
+name = "bcmodel-wasm"
+version = "0.1.0"
+edition = "2021"
+description = "WebAssembly bindings for .bcmodel parser"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+bcmodel-core = { path = "../bcmodel-core" }
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
+js-sys = "0.3"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

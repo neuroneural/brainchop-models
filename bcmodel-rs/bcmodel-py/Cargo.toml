@@ -1,0 +1,15 @@
+[package]
+name = "bcmodel-py"
+version = "0.1.0"
+edition = "2021"
+description = "Python bindings for .bcmodel parser"
+
+[lib]
+name = "bcmodel"
+crate-type = ["cdylib"]
+
+[dependencies]
+bcmodel-core = { path = "../bcmodel-core" }
+pyo3 = { version = "0.23", features = ["extension-module"] }
+numpy = "0.23"
+serde_json = "1"
