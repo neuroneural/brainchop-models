@@ -1,0 +1,37 @@
+{
+  "name": "bcmodel-viewer",
+  "displayName": "BrainChop Model Viewer",
+  "description": "Read-only preview for .bcmodel brain MRI segmentation model files",
+  "version": "0.1.0",
+  "publisher": "brainchop",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Visualization"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "bcmodel.preview",
+        "displayName": "BrainChop Model Preview",
+        "selector": [
+          {
+            "filenamePattern": "*.bcmodel"
+          }
+        ],
+        "priority": "default"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
+  }
+}
