@@ -1,11 +1,14 @@
 # Meshnet
+- mindgrab
 - model5_gw_ae
 - model11_gw_ae
 - model18cls
-- model20chan3cls  
-- model21_104class  
-- model30chan18cls  
+- model20chan3cls
+- model21_104class
+- model24chan104cls — backs the `DKatlas` model (Desikan-Killiany atlas, 104 labels); deep gridding-free GroupNorm architecture that replaces `model21_104class`
+- model30chan18cls
 - model30chan50cls
+- subcortical
 
 # Others
 
