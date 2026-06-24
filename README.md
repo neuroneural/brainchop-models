@@ -6,7 +6,9 @@
 - model20chan3cls
 - model21_104class
 - model24chan104cls — backs the `DKatlas` model (Desikan-Killiany atlas, 104 labels); deep gridding-free GroupNorm architecture that replaces `model21_104class`
+- model24chan18cls — backs the `robust_subcortical_mini` model (gray/white matter + subcortical, 18 labels); 24-channel deep gridding-free GroupNorm architecture
 - model30chan18cls
+- model32chan18cls — backs the `robust_subcortical` model (gray/white matter + subcortical, 18 labels); deep gridding-free GroupNorm architecture
 - model30chan50cls
 - subcortical
 

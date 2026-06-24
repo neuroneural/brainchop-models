@@ -1,0 +1,25 @@
+{
+  "header": "18-class (GM/WM + subcortical) MeshNet: 32-channel, 13-layer gridding-free deep dilation (RF ~= 256^3).",
+  "comment": "Symmetric coprime dilation ramp 1,3,5,7,13,19,31,19,13,7,5,3,1 (13 conv layers + final 1x1). RF = 1+2*sum = 255 voxels -> matched to the 256 cube; all rates odd, gcd 1, a dilation=1 layer present, so no gridding holes (Wang et al., WACV 2018). Capacity from depth, not width: peak activation memory stays at channels x 256^3 (one buffer reused per layer). NO skip/residual connections (anti-U-Net); the deep plain stack relies on per-channel GroupNorm in every block, hence affine=true. Hidden convs are bias-free; only the final 1x1 classifier conv carries a bias. Trained with GELU activations on SynthSeg-style synthetic data (synth18/label18).",
+  "bnorm": true,
+  "gelu": true,
+  "affine": true,
+  "dropout_p": 0,
+  "bias": false,
+  "layers": [
+    {"in_channels": 1,  "out_channels": 32, "kernel_size": 3, "padding": 1,  "stride": 1, "dilation": 1},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 3,  "stride": 1, "dilation": 3},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 5,  "stride": 1, "dilation": 5},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 7,  "stride": 1, "dilation": 7},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 13, "stride": 1, "dilation": 13},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 19, "stride": 1, "dilation": 19},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 31, "stride": 1, "dilation": 31},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 19, "stride": 1, "dilation": 19},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 13, "stride": 1, "dilation": 13},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 7,  "stride": 1, "dilation": 7},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 5,  "stride": 1, "dilation": 5},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 3,  "stride": 1, "dilation": 3},
+    {"in_channels": 32, "out_channels": 32, "kernel_size": 3, "padding": 1,  "stride": 1, "dilation": 1},
+    {"in_channels": 32, "out_channels": 18, "kernel_size": 1, "padding": 0, "stride": 1, "dilation": 1, "bias": true}
+  ]
+}
